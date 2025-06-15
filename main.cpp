@@ -31,15 +31,6 @@ void buzzerActive(bool status) {
     }
 }
 
-// beep 1 second
-void notificationPowerUp() {
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep 1 second
-        delay(1000);
-        buzzerActive(false);
-}
-
 // beep x1
 void notificationMagneticButtonPressed() {
         buzzerActive(false);
@@ -138,14 +129,13 @@ void unblockSystemIfMagneticButtonIsPressed(bool magneticButtonPressed) {
 }
 
 void setup() {
-    delay(1000);
+    delay(2000);
     pinMode(pin_magneticButton, INPUT_PULLUP);
     pinMode(pin_doorSensor, INPUT_PULLUP);
     pinMode(pin_buzzer, OUTPUT);
     pinMode(pin_relayOnGasPump, OUTPUT);
 
     systemBlocked = (bool)(EEPROM.read(0));
-    notificationPowerUp();
 }
 
 void loop() {
