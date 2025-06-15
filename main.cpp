@@ -1,15 +1,18 @@
-#define pin_magneticButton 2
-#define pin_doorSensor 3
-#define pin_buzzer 4
-#define pin_relayOnGasPump 5
 #include <EEPROM.h>
 
-bool systemBlocked = false;
-int magneticButtonPressedTime = 0;
-int secondsHoldingMagneticButtonToUnblockSystem = 5;
-int secondsWithoutPressingMagneticButtonToBlockSystem = 60;
-bool temporizerToPressMagneticButton = true;
+const int pin_magneticButton = 2
+const int pin_doorSensor = 3
+const int pin_buzzer = 4
+const int pin_relayOnGasPump = 5
+
+const int secondsWithoutPressingMagneticButtonToBlockSystem = 60;
 int secondsWithoutPressingMagneticButton = 0;
+
+const int secondsHoldingMagneticButtonToUnblockSystem = 5;
+int secondsHoldingMagneticButton = 0;
+
+bool systemBlocked = false;
+bool temporizerToPressMagneticButton = true;
 bool stopTemporizerUntilNextDoorOpen = false;
 
 void gasPumpOff(bool status) {
@@ -28,24 +31,6 @@ void buzzerActive(bool status) {
     }
 }
 
-void unblockSystemIfMagneticButtonIsPressedLongEnough(bool magneticButtonPressed) {
-    if (magneticButtonPressed) {
-        notificationMagneticButtonPressed();
-        magneticButtonPressedTime += 1;
-
-        if (magneticButtonPressedTime > secondsHoldingMagneticButtonToUnblockSystem) {
-            magneticButtonPressedTime = 0;
-            systemBlocked = false;
-            temporizerToPressMagneticButton = false;
-            stopTemporizerUntilNextDoorOpen = true;
-            secondsWithoutPressingMagneticButton = 0;
-            EEPROM.update(0 , (byte)(0) ); // save unblocked state in EEPROM
-        }
-    } else {
-        magneticButtonPressedTime = 0;
-    }
-}
-
 void notificationMagneticButtonPressed() {
         buzzerActive(false);
         delay(50);
@@ -54,11 +39,26 @@ void notificationMagneticButtonPressed() {
         buzzerActive(false);
 }
 
-void setup() {
+void unblockSystemIfMagneticButtonIsPressedLongEnough(bool magneticButtonPressed) {
+    if (magneticButtonPressed) {
+        notificationMagneticButtonPressed();
+        secondsHoldingMagneticButton += 1;
 
+        if (secondsHoldingMagneticButton > secondsHoldingMagneticButtonToUnblockSystem) {
+            secondsHoldingMagneticButton = 0;
+            systemBlocked = false;
+            temporizerToPressMagneticButton = false;
+            stopTemporizerUntilNextDoorOpen = true;
+            secondsWithoutPressingMagneticButton = 0;
+            EEPROM.update(0 , (byte)(0) ); // save unblocked state in EEPROM
+        }
+    } else {
+        secondsHoldingMagneticButton = 0;
+    }
+}
+
+void setup() {
     delay(500);
-    Serial.begin(9600);
-    
     pinMode(pin_magneticButton, INPUT_PULLUP);
     pinMode(pin_doorSensor, INPUT_PULLUP);
     pinMode(pin_buzzer, OUTPUT);
@@ -68,7 +68,6 @@ void setup() {
 }
 
 void loop() {
-
     delay(1000);
     bool magneticButtonPressed = !digitalRead(pin_magneticButton);
     bool doorOpen = digitalRead(pin_doorSensor);
@@ -86,19 +85,20 @@ void loop() {
     // if system is unBlocked:
     // - turn on gasPump
     // - turn off buzzer
-    // - temporizerToPressMagneticButton is triggered when door is open and stopTemporizerUntilNextDoorOpen is false... if not pressed within 60 seconds system is blocked
+    // - temporizerToPressMagneticButton is triggered when door is open and stopTemporizerUntilNextDoorOpen is false... if magnetic button is not pressed within 60 seconds the system is blocked
+    //   (temporizer is triggered after closing the door and then opening it again)
     else if (!systemBlocked) {
         gasPumpOff(false);
         buzzerActive(false);
+
+        if (!doorOpen) {
+            stopTemporizerUntilNextDoorOpen = false;
+        }
 
         if (doorOpen && !stopTemporizerUntilNextDoorOpen) {
             temporizerToPressMagneticButton = true;
         }
         
-        if (!doorOpen) {
-            stopTemporizerUntilNextDoorOpen = false;
-        }
-
         if (temporizerToPressMagneticButton) {
             secondsWithoutPressingMagneticButton += 1;
 
