@@ -1,9 +1,9 @@
 #include <EEPROM.h>
 
-const int pin_magneticButton = 2
-const int pin_doorSensor = 3
-const int pin_buzzer = 4
-const int pin_relayOnGasPump = 5
+const int pin_magneticButton = 2;
+const int pin_doorSensor = 3;
+const int pin_buzzer = 4;
+const int pin_relayOnGasPump = 5;
 
 const int secondsWithoutPressingMagneticButtonToBlockSystem = 60;
 int secondsWithoutPressingMagneticButton = 0;
