@@ -31,20 +31,80 @@ void buzzerActive(bool status) {
     }
 }
 
+// beep x1
 void notificationMagneticButtonPressed() {
         buzzerActive(false);
         delay(50);
-        buzzerActive(true);
+        buzzerActive(true); // beep
         delay(50);
         buzzerActive(false);
 }
 
-void unblockSystemIfMagneticButtonIsPressedLongEnough(bool magneticButtonPressed) {
+// beep x2
+void notificationSystemUnblockedByPressing() {
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+}
+
+// beep x10
+void notificationSystemUnblockedByHolding() {
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+        delay(50);
+        buzzerActive(true); // beep
+        delay(50);
+        buzzerActive(false);
+}
+
+void unblockSystemIfMagneticButtonIsHoldedLongEnough(bool magneticButtonPressed) {
     if (magneticButtonPressed) {
         notificationMagneticButtonPressed();
         secondsHoldingMagneticButton += 1;
 
         if (secondsHoldingMagneticButton >= secondsHoldingMagneticButtonToUnblockSystem) {
+            notificationSystemUnblockedByHolding();
             secondsHoldingMagneticButton = 0;
             systemBlocked = false;
             temporizerToPressMagneticButton = false;
@@ -55,6 +115,16 @@ void unblockSystemIfMagneticButtonIsPressedLongEnough(bool magneticButtonPressed
     } else {
         secondsHoldingMagneticButton = 0;
     }
+}
+
+void unblockSystemIfMagneticButtonIsPressed(bool magneticButtonPressed) {
+    if (magneticButtonPressed) {
+        notificationSystemUnblockedByPressing();
+        systemBlocked = false;
+        temporizerToPressMagneticButton = false;
+        stopTemporizerUntilNextDoorOpen = true;
+        secondsWithoutPressingMagneticButton = 0;
+        EEPROM.update(0 , (byte)(0) ); // save unblocked state in EEPROM
 }
 
 void setup() {
@@ -79,7 +149,7 @@ void loop() {
     if (systemBlocked) {
         gasPumpOff(true);
         buzzerActive(true);
-        unblockSystemIfMagneticButtonIsPressedLongEnough(magneticButtonPressed);
+        unblockSystemIfMagneticButtonIsHoldedLongEnough(magneticButtonPressed);
     }
 
     // if system is unBlocked:
@@ -102,7 +172,7 @@ void loop() {
         if (temporizerToPressMagneticButton) {
             secondsWithoutPressingMagneticButton += 1;
 
-            unblockSystemIfMagneticButtonIsPressedLongEnough(magneticButtonPressed);
+            unblockSystemIfMagneticButtonIsPressed(magneticButtonPressed);
 
             if (secondsWithoutPressingMagneticButton > secondsWithoutPressingMagneticButtonToBlockSystem) {
                 systemBlocked = true;
