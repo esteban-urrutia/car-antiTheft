@@ -138,7 +138,7 @@ void unblockSystemIfMagneticButtonIsPressed(bool magneticButtonPressed) {
 }
 
 void setup() {
-    delay(500);
+    delay(1000);
     pinMode(pin_magneticButton, INPUT_PULLUP);
     pinMode(pin_doorSensor, INPUT_PULLUP);
     pinMode(pin_buzzer, OUTPUT);
