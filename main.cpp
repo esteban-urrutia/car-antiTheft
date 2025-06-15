@@ -134,6 +134,7 @@ void unblockSystemIfMagneticButtonIsPressed(bool magneticButtonPressed) {
         stopTemporizerUntilNextDoorOpen = true;
         secondsWithoutPressingMagneticButton = 0;
         EEPROM.update(0 , (byte)(0) ); // save unblocked state in EEPROM
+    }
 }
 
 void setup() {
