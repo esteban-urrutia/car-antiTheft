@@ -44,7 +44,7 @@ void unblockSystemIfMagneticButtonIsPressedLongEnough(bool magneticButtonPressed
         notificationMagneticButtonPressed();
         secondsHoldingMagneticButton += 1;
 
-        if (secondsHoldingMagneticButton > secondsHoldingMagneticButtonToUnblockSystem) {
+        if (secondsHoldingMagneticButton >= secondsHoldingMagneticButtonToUnblockSystem) {
             secondsHoldingMagneticButton = 0;
             systemBlocked = false;
             temporizerToPressMagneticButton = false;
