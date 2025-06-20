@@ -1,3 +1,4 @@
+
 #include <EEPROM.h>
 
 const int pin_magneticButton = 2;
@@ -8,7 +9,7 @@ const int pin_relayOnGasPump = 5;
 const int secondsWithoutPressingMagneticButtonToBlockSystem = 60;
 int secondsWithoutPressingMagneticButton = 0;
 
-const int secondsHoldingMagneticButtonToUnblockSystem = 5;
+const int secondsHoldingMagneticButtonToUnblockSystem = 2;
 int secondsHoldingMagneticButton = 0;
 
 bool systemBlocked = false;
@@ -53,28 +54,8 @@ void notificationSystemUnblockedByPressing() {
         buzzerActive(false);
 }
 
-// beep x10
+// beep x5
 void notificationSystemUnblockedByHolding() {
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep
-        delay(50);
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep
-        delay(50);
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep
-        delay(50);
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep
-        delay(50);
-        buzzerActive(false);
-        delay(50);
-        buzzerActive(true); // beep
-        delay(50);
         buzzerActive(false);
         delay(50);
         buzzerActive(true); // beep
@@ -104,13 +85,13 @@ void unblockSystemIfMagneticButtonIsHoldedLongEnough(bool magneticButtonPressed)
         secondsHoldingMagneticButton += 1;
 
         if (secondsHoldingMagneticButton >= secondsHoldingMagneticButtonToUnblockSystem) {
-            notificationSystemUnblockedByHolding();
             secondsHoldingMagneticButton = 0;
             systemBlocked = false;
             temporizerToPressMagneticButton = false;
             stopTemporizerUntilNextDoorOpen = true;
             secondsWithoutPressingMagneticButton = 0;
             EEPROM.update(0 , (byte)(0) ); // save unblocked state in EEPROM
+            notificationSystemUnblockedByHolding();
         }
     } else {
         secondsHoldingMagneticButton = 0;
@@ -129,7 +110,7 @@ void unblockSystemIfMagneticButtonIsPressed(bool magneticButtonPressed) {
 }
 
 void setup() {
-    delay(2000);
+    delay(1000);
     pinMode(pin_magneticButton, INPUT_PULLUP);
     pinMode(pin_doorSensor, INPUT_PULLUP);
     pinMode(pin_buzzer, OUTPUT);
@@ -139,7 +120,6 @@ void setup() {
 }
 
 void loop() {
-    delay(1000);
     bool magneticButtonPressed = !digitalRead(pin_magneticButton);
     bool doorOpen = digitalRead(pin_doorSensor);
 
@@ -181,4 +161,6 @@ void loop() {
             }
         }
     }
+
+    delay(1000);
 }
